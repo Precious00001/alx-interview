@@ -1,8 +1,11 @@
 #!/usr/bin/python3
+'''The minimum operations coding challenge.
+'''
+
+
 def minOperations(n):
-    """
-    Calculates the fewest number of operations needed to
-    result in exactly n H characters in the file.
+    '''Computes the fewest number of operations needed to result
+    in exactly n H characters.
 
     Parameters:
     - n (int): The desired number of H characters.
@@ -10,27 +13,30 @@ def minOperations(n):
     Returns:
     - int: The fewest number of operations needed.
     If n is impossible to achieve, returns 0.
-    """
-    if n <= 1:
+    '''
+    # Check if n is an integer
+    if not isinstance(n, int):
         return 0
 
-    # Initialize the number of operations to 0
-    operations = 0
-    # Initialize the current buffer size to 1
-    buffer_size = 1
-    # Initialize the clipboard content to 0 (no content initially)
-    clipboard_content = 0
+    # Initialize variables
+    ops_count = 0        # Number of operations
+    clipboard = 0        # Content in the clipboard
+    done = 1             # Current content in the file
 
-    while buffer_size < n:
-        if n % buffer_size == 0:
-            # If the buffer size divides n, perform a Copy All operation
-            clipboard_content = buffer_size
-            # Increment the number of operations
-            operations += 1
+    while done < n:
+        if clipboard == 0:
+            # Initial copy all and paste
+            clipboard = done
+            done += clipboard
+            ops_count += 2
+        elif n - done > 0 and (n - done) % done == 0:
+            # Copy all and paste
+            clipboard = done
+            done += clipboard
+            ops_count += 2
+        elif clipboard > 0:
+            # Paste
+            done += clipboard
+            ops_count += 1
 
-        # Perform a Paste operation, doubling the buffer size
-        buffer_size += clipboard_content
-        # Increment the number of operations
-        operations += 1
-
-    return operations
+    return ops_count
