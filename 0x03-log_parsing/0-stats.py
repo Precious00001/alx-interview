@@ -1,24 +1,57 @@
 #!/usr/bin/python3
-import random
+"""Script that reads stdin line by line and computes metrics."""
+
 import sys
-from time import sleep
-import datetime
 
-# Generate 10,000 log entries
-for i in range(10000):
-    # Introduce a random delay to simulate a real log generator
-    sleep(random.random())
+# Initialize variables
+i = 0
+sum_file_size = 0
+status_code = {'200': 0,
+               '301': 0,
+               '400': 0,
+               '401': 0,
+               '403': 0,
+               '404': 0,
+               '405': 0,
+               '500': 0}
 
-    # Create a log entry with a random IP address, timestamp, HTTP status code, and file size
-    log_entry = "{:d}.{:d}.{:d}.{:d} - [{}] \"GET /projects/260 HTTP/1.1\" {} {}\n".format(
-        random.randint(1, 255), random.randint(1, 255), random.randint(1, 255), random.randint(1, 255),
-        datetime.datetime.now(),
-        random.choice([200, 301, 400, 401, 403, 404, 405, 500]),
-        random.randint(1, 1024)
-    )
+try:
+    # Read input lines from stdin
+    for line in sys.stdin:
+        # Split the line into individual words
+        args = line.split(' ')
 
-    # Write the log entry to the standard output (sys.stdout)
-    sys.stdout.write(log_entry)
+        # Check if the line has enough words
+        if len(args) > 2:
+            # Extract status line and file size
+            status_line = args[-2]
+            file_size = args[-1]
 
-    # Flush the output to ensure immediate display
-    sys.stdout.flush()
+            # Update status code counts
+            if status_line in status_code:
+                status_code[status_line] += 1
+
+            # Update total file size
+            sum_file_size += int(file_size)
+            i += 1
+
+            # Print metrics every 10 lines
+            if i == 10:
+                print('File size: {:d}'.format(sum_file_size))
+                sorted_keys = sorted(status_code.keys())
+                for key in sorted_keys:
+                    value = status_code[key]
+                    if value != 0:
+                        print('{}: {}'.format(key, value))
+                i = 0
+
+except Exception:
+    pass
+finally:
+    # Print final metrics
+    print('File size: {:d}'.format(sum_file_size))
+    sorted_keys = sorted(status_code.keys())
+    for key in sorted_keys:
+        value = status_code[key]
+        if value != 0:
+            print('{}: {}'.format(key, value))
