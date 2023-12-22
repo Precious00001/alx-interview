@@ -1,44 +1,24 @@
 #!/usr/bin/python3
+import random
 import sys
+from time import sleep
+import datetime
 
-def print_stats(total_size, status_counts):
-    print("File size: {}".format(total_size))
-    for status_code in sorted(status_counts.keys()):
-        print("{}: {}".format(status_code, status_counts[status_code]))
+# Generate 10,000 log entries
+for i in range(10000):
+    # Introduce a random delay to simulate a real log generator
+    sleep(random.random())
 
-def main():
-    total_size = 0
-    status_counts = {}
+    # Create a log entry with a random IP address, timestamp, HTTP status code, and file size
+    log_entry = "{:d}.{:d}.{:d}.{:d} - [{}] \"GET /projects/260 HTTP/1.1\" {} {}\n".format(
+        random.randint(1, 255), random.randint(1, 255), random.randint(1, 255), random.randint(1, 255),
+        datetime.datetime.now(),
+        random.choice([200, 301, 400, 401, 403, 404, 405, 500]),
+        random.randint(1, 1024)
+    )
 
-    try:
-        for i, line in enumerate(sys.stdin, 1):
-            parts = line.split()
-            
-            # Skip lines with incorrect format
-            if len(parts) != 12 or parts[8] != '"GET' or parts[10] != 'HTTP/1.1"':
-                continue
-            
-            # Parse file size and status code
-            file_size = int(parts[11])
-            status_code = int(parts[9])
+    # Write the log entry to the standard output (sys.stdout)
+    sys.stdout.write(log_entry)
 
-            # Update total file size
-            total_size += file_size
-
-            # Update status counts
-            if status_code in status_counts:
-                status_counts[status_code] += 1
-            else:
-                status_counts[status_code] = 1
-
-            # Print stats every 10 lines
-            if i % 10 == 0:
-                print_stats(total_size, status_counts)
-    
-    except KeyboardInterrupt:
-        # Handle keyboard interruption and print final stats
-        print_stats(total_size, status_counts)
-
-if __name__ == "__main__":
-    main()
-
+    # Flush the output to ensure immediate display
+    sys.stdout.flush()
