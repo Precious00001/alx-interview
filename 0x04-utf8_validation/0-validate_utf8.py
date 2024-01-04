@@ -34,7 +34,7 @@ def validUTF8(data):
             if nbytes == 1 or nbytes > 4:
                 return False
         else:
-            # Check if the current byte is correctly formatted based on UTF-8 rules
+            # Check if the current byte is correctly formatted
             if not (i & v1 and not (i & v2)):
                 return False
 
